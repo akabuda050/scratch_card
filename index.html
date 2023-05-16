@@ -86,8 +86,8 @@ https://github.com/andreruffert/scratchie.js
                 brush = new Image();
 
             let imageFile = Math.floor(randomIntFromInterval(1, 17));
-            console.log(window.location.host + `assets/${imageFile}.png`)
-            run(window.location.host + `assets/${imageFile}.png`)
+            console.log(window.location.host + `/scratch_card/assets/${imageFile}.png`)
+            run(window.location.host + `/scratch_card/assets/${imageFile}.png`)
             function run(imageBase64) {
                 image.src = imageBase64;
                 image.width = 300;
