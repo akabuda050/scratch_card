@@ -36,15 +36,15 @@ https://github.com/andreruffert/scratchie.js
         }
 
         body {
-            padding: 20px 0;
+            padding: 0;
+            margin: 0;
         }
 
         .container {
-            border: 3px solid #1ebf24;
+            border: 2px solid #1ebf24;
             position: relative;
-            width: 300px;
-            height: 300px;
-            margin: 0 auto;
+            width: 99vw;
+            height: 99vw;
             -webkit-user-select: none;
             -moz-user-select: none;
             -ms-user-select: none;
@@ -104,8 +104,8 @@ https://github.com/andreruffert/scratchie.js
             var canvas = document.createElement('canvas');
 
             // Set the canvas width and height
-            canvas.width = 300;
-            canvas.height = 300;
+            canvas.width = container.clientWidth;
+            canvas.height = container.clientWidth;
             canvas.classList.add('canvas')
             var canvasWidth = canvas.width,
                 canvasHeight = canvas.height,
@@ -194,7 +194,7 @@ https://github.com/andreruffert/scratchie.js
                 function handlePercentage(filledInPixels) {
                     filledInPixels = filledInPixels || 0;
                     console.log(filledInPixels + '%');
-                    if (filledInPixels > 50) {
+                    if (filledInPixels > 30) {
                         canvas.parentNode.removeChild(canvas);
                     }
                 }
