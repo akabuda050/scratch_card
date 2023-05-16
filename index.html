@@ -13,19 +13,34 @@ https://github.com/andreruffert/scratchie.js
 
 <body>
     <div class="container" id="js-container">
-        <canvas class="canvas" id="js-canvas" width="300" height="300"></canvas>
         <div class="form" style="visibility: hidden;">
             <h2 id="result"></h2>
             <h2 id="result-amount"></h2>
         </div>
+        <button id="restart-button" onclick="init()">Restart</button>
     </div>
     <style>
+        #restart-button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 20px;
+            width: 100%;
+        }
+
+        #restart-button:hover {
+            background-color: #45a049;
+        }
+
         body {
             padding: 20px 0;
         }
 
         .container {
-            border: 3px solid yellow;
+            border: 3px solid #1ebf24;
             position: relative;
             width: 300px;
             height: 300px;
@@ -53,22 +68,22 @@ https://github.com/andreruffert/scratchie.js
         }
     </style>
     <script>
-        (function () {
-
-            'use strict';
+        'use strict';
+        function init() {
+            var canv = document.getElementById('js-canvas');
+            document.querySelectorAll('.form')[0].style.visibility = 'hidden';
             function randomIntFromInterval(min, max) {
                 return (Math.random() * (max - min + 1) + min).toFixed(2);
             }
 
             const results = Array.apply(0, new Array(200)).map(() => {
-                const amount = randomIntFromInterval(-10, 10);
+                const amount = randomIntFromInterval(-100, 10);
 
                 return {
-                    amount,
+                    amount: amount < 0 ? 0 : amount,
                     text: amount < 0 ? 'Good luck next time :)' : 'Congrats!'
                 }
             });
-
 
             const result = results[Math.floor(Math.random() * results.length)]
             const resultElem = document.getElementById('result')
@@ -78,21 +93,46 @@ https://github.com/andreruffert/scratchie.js
 
             var isDrawing, lastPoint;
             var container = document.getElementById('js-container'),
-                canvas = document.getElementById('js-canvas'),
-                canvasWidth = canvas.width,
-                canvasHeight = canvas.height,
-                ctx = canvas.getContext('2d'),
                 image = new Image(),
                 brush = new Image();
 
-            let imageFile = Math.floor(randomIntFromInterval(1, 17));
-            console.log(`https://akabuda050.github.io/scratch_card/assets/${imageFile}.png`)
-            run(`https://akabuda050.github.io/scratch_card/assets/${imageFile}.png`)
-            function run(imageBase64) {
-                image.src = imageBase64;
-                image.width = 300;
-                image.height = 300;
+            if (canv) {
+                container.removeChild(canv)
+            }
+
+            // Create a new canvas element
+            var canvas = document.createElement('canvas');
+
+            // Set the canvas width and height
+            canvas.width = 300;
+            canvas.height = 300;
+            canvas.classList.add('canvas')
+            var canvasWidth = canvas.width,
+                canvasHeight = canvas.height,
+                ctx = canvas.getContext('2d');
+
+            // Set other canvas properties if needed
+            canvas.id = 'js-canvas';
+
+            // Append the canvas element to the document body or another container
+            container.prepend(canvas);
+
+            run()
+            function run() {
+                canvas.removeEventListener('mousedown', handleMouseDown);
+                canvas.removeEventListener('touchstart', handleMouseDown);
+                canvas.removeEventListener('mousemove', handleMouseMove);
+                canvas.removeEventListener('touchmove', handleMouseMove);
+                canvas.removeEventListener('mouseup', handleMouseUp);
+                canvas.removeEventListener('touchend', handleMouseUp);
+                image.crossOrigin = "Anonymous";
+
+                let imageFile = Math.floor(randomIntFromInterval(1, 17));
+                console.log(`https://akabuda050.github.io/scratch_card/assets/${imageFile}.png`)
+                image.src = `https://akabuda050.github.io/scratch_card/assets/${imageFile}.png`;
+
                 image.onload = function () {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
                     ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
                     // Show the form when Image is loaded.
                     document.querySelectorAll('.form')[0].style.visibility = 'visible';
@@ -189,7 +229,9 @@ https://github.com/andreruffert/scratchie.js
                     isDrawing = false;
                 }
             }
-        })();
+        };
+
+        init();
     </script>
 </body>
 
