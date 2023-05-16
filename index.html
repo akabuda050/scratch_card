@@ -85,24 +85,9 @@ https://github.com/andreruffert/scratchie.js
                 image = new Image(),
                 brush = new Image();
 
-            const toDataURL = url => fetch(url)
-                .then(response => response.blob())
-                .then(blob => new Promise((resolve, reject) => {
-                    const reader = new FileReader()
-                    reader.onloadend = () => resolve(reader.result)
-                    reader.onerror = reject
-                    reader.readAsDataURL(blob)
-                }))
-
-
-            // base64 Workaround because Same-Origin-Policy
-            toDataURL('https://cdn.midjourney.com/54931753-1718-47b4-aac6-4df10bf9b7ca/0_3.png')
-                .then(dataUrl => {
-                    console.log('RESULT:', dataUrl)
-                    run(dataUrl);
-                })
-
-
+            let imageFile = Math.floor(randomIntFromInterval(1, 17));
+            console.log(window.location.host + `assets/${imageFile}.png`)
+            run(window.location.host + `assets/${imageFile}.png`)
             function run(imageBase64) {
                 image.src = imageBase64;
                 image.width = 300;
