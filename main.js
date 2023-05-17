@@ -5,77 +5,77 @@ function getRandomInt(min, max) {
 }
 
 const paytable = {
-    1: 0.05,   // Payout for number 1
-    2: 0.08,   // Payout for number 2
-    3: 0.08,   // Payout for number 3
-    4: 0.10,   // Payout for number 4
-    5: 0.12,   // Payout for number 5
-    6: 0.12,   // Payout for number 6
-    7: 0.15,   // Payout for number 7
-    8: 0.15,   // Payout for number 8
-    9: 0.20,   // Payout for number 9
-    10: 0.20,  // Payout for number 10
-    11: 0.25,  // Payout for number 11
-    12: 0.30,  // Payout for number 12
-    13: 0.35,  // Payout for number 13
-    14: 0.40,  // Payout for number 14
-    15: 0.50,  // Payout for number 15
-    16: 0.60,  // Payout for number 16
-    17: 0.70   // Payout for number 17
+    1: 1 * 7.58823529411,
+    2: 2 * 3.58823529411,
+    3: 3 * 4.58823529411,
+    4: 4 * 5.58823529411,
+    5: 5 * 0.58823529411,
+    6: 6 * 6.58823529411,
+    7: 7 * 1.58823529411,
+    8: 8 * 4.58823529411,
+    9: 9 * 0.58823529411,
+    10: 10 * 4.58823529411,
+    11: 11 * 0.58823529411,
+    12: 12 * 4.58823529411,
+    13: 13 * 1.58823529411,
+    14: 14 * 5.58823529411,
+    15: 15 * 0.58823529411,
+    16: 16 * 0.58823529411,
+    17: 17 * 0.58823529411,
 };
 
 // Set up the reels and paytable
 const reels = [];
 
 for (let i = 0; i < 3; i++) {
-  const reel = [];
+    const reel = [];
 
-  // Fill the reel with numbers based on the desired RTP
-  for (let number in paytable) {
-    const payout = paytable[number];
-    const occurrence = Math.ceil(number * payout) * 98; // Increase the occurrence by multiplying by 1000
+    // Fill the reel with numbers based on the desired RTP
+    for (let number in paytable) {
+        const payout = paytable[number];
+        const occurrence = Math.ceil(payout / 0.98 / 0.98) ; // Increase the occurrence by multiplying by 1000
 
-    reel.push(...Array(occurrence).fill(number));
-  }
+        reel.push(...Array(occurrence).fill(number));
+    }
 
-  reels.push(reel);
+    reels.push(reel);
 }
 
-console.log({paytable, reels})
+console.log({ paytable, reels })
 
 // Simulate the game and calculate RTP
 function simulateGame() {
     let totalSpins = 0;
     let totalPayout = 0;
-  
+
     while (totalSpins < 100000) {
-      const spinResult = spinReels();
-  
-      if (isWinningCombination(spinResult)) {
-        const payout = paytable[spinResult[0]];
-        totalPayout += payout;
-      }
-  
-      totalSpins++;
+        const spinResult = spinReels();
+
+        if (isWinningCombination(spinResult)) {
+            const payout = paytable[spinResult[0]];
+            totalPayout += payout;
+        }
+
+        totalSpins++;
     }
-  
+
     const rtp = (totalPayout / totalSpins) * 100;
     return rtp.toFixed(2);
-  }
-  
-  // Spin the reels and return the result
-  function spinReels() {
+}
+
+// Spin the reels and return the result
+function spinReels() {
     const result = [];
     for (let i = 0; i < 3; i++) {
-      const reel = reels[i];
-      const randomIndex = Math.floor(Math.random() * reel.length);
-      result.push(reel[randomIndex]);
+        const reel = reels[i];
+        const randomIndex = Math.floor(Math.random() * reel.length);
+        result.push(reel[randomIndex]);
     }
     return result;
-  }
-  
-  // Check if the spin result is a winning combination
-  function isWinningCombination(spinResult) {
+}
+
+// Check if the spin result is a winning combination
+function isWinningCombination(spinResult) {
     const counts = {};
     for (let i = 0; i < spinResult.length; i++) {
         const num = spinResult[i];
@@ -85,14 +85,15 @@ function simulateGame() {
         }
     }
     return false;
-  }
-  
-  // Run the simulation and output the RTP
-  //const rtp = simulateGame();
-  //console.log(`Simulated RTP: ${rtp}%`);
+}
+
+// Run the simulation and output the RTP
+//const rtp = simulateGame();
+//console.log(`Simulated RTP: ${rtp}%`);
 
 const scratchContainers = document.querySelectorAll('.js-scratchcard');
 
+const resultOfGame = []
 for (let scratch of scratchContainers) {
     const idx = scratch.dataset.idx;
     const number = reels[idx][Math.floor(Math.random() * reels[idx].length)];
@@ -110,7 +111,18 @@ for (let scratch of scratchContainers) {
         pointSize: 0,
         percentToFinish: 20,
         callback: function () {
+            resultOfGame.push(number);
 
+            if (resultOfGame.length === 3) {
+                if (isWinningCombination(resultOfGame)) {
+                    const payout = paytable[resultOfGame[0]];
+
+                    document.getElementById('result-text').innerText = `You won $${payout}`;
+                } else {
+                    document.getElementById('result-text').innerText = `Good luck next time :)`;
+                }
+                document.getElementById('restart-button').style = `display: inline-block`;
+            }
         }
     });
 
@@ -125,3 +137,6 @@ for (let scratch of scratchContainers) {
     });
 }
 
+function restart() {
+    window.location.reload()
+}
