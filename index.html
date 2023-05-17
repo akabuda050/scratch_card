@@ -16,17 +16,18 @@ https://github.com/andreruffert/scratchie.js
 </head>
 
 <body>
+    <div class="result">
+        <span id="balance"></span>
+        <span id="result-text">Scratch cards</span>
+        <button id="restart-button" onclick="restart()">Reveal</button>
+    </div>
     <div class="sc__wrapper">
         <!-- scratchcard -->
         <div id="js-scratchcard-1" data-idx="0" class="js-scratchcard"></div>
         <div id="js-scratchcard-2" data-idx="1" class="js-scratchcard"></div>
         <div id="js-scratchcard-3" data-idx="2" class="js-scratchcard"></div>
     </div>
-    <div class="result">
-        <span id="balance"></span>
-        <span id="result-text">Scratch cards</span>
-        <div id="result-sym"></div>
-        <button id="restart-button" onclick="restart()">Reveal</button>
+    <div class="sc__wrapper2" id="sc__wrapper2">
     </div>
     <script src="./main.js"></script>
 </body>

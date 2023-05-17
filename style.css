@@ -61,16 +61,26 @@ body {
    border-radius: 4px;
  }
 
- #result-sym {
-   display: flex;
-   align-items: center;
-   justify-content: center;
-   gap: 5px;
-   width: 100%;
- }
+ .sc__wrapper2 .scratchcard img {
+   width: 30px;
+   height: 30px;
+}
 
- #result-sym > div{
+.sc__wrapper2 {
+   font-size: 1rem;
+   border: 1px solid #9d00ff;
+   padding: 7px;
+   width: 315px;
+   font-family: monospace;
+   font-weight: 600;
+   display: grid;
+   grid-template-columns: repeat(3, 1fr);
+   grid-gap: 10px;
+}
+
+.sc__wrapper2 .scratchcard {
    display: flex;
    align-items: center;
-   gap: 2px;
- }
+   gap: 5px;
+   padding: 2px;
+}

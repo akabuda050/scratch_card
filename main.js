@@ -54,6 +54,22 @@ const paytable = {
     12: 2,
 };
 
+const paytableWrapper = document.getElementById('sc__wrapper2')
+Object.keys(paytable).forEach((p) => {
+    const paytableItem = document.createElement('div');
+    paytableItem.id = `scratchcard-${p}`;
+    paytableItem.classList.add('scratchcard');
+    
+    const image = new Image();
+    image.src = `https://akabuda050.github.io/scratch_card/rewards/${p}.png`
+
+    const paytableItemPayout = document.createElement('span');
+    paytableItemPayout.innerText = `$${paytable[p]}`;
+    paytableItem.append(image, paytableItemPayout);
+
+    paytableWrapper.prepend(paytableItem);
+})
+
 const reels = [];
 
 for (let i = 0; i < 3; i++) {
@@ -148,13 +164,19 @@ let cards = [];
 
 function start() {
     balance -= 0.5;
+    document.getElementById('result-text').innerText = `Scratch cards`;
+
     document.getElementById('balance').innerText = `$${balance.toFixed(2)}`;
     document.getElementById('restart-button').innerText = `Reveal`;
-    document.getElementById('result-sym').innerHTML = '';
+    document.getElementById('restart-button').style = `display: none`;
     resultOfGame = []
     cards = [];
-    const scratchContainers = document.querySelectorAll('.js-scratchcard');
+    Object.keys(paytable).forEach((p) => {
+        const scratchcard = document.getElementById(`scratchcard-${p}`);
+        scratchcard.style = '';
+    })
 
+    const scratchContainers = document.querySelectorAll('.js-scratchcard');
     for (let scratch of scratchContainers) {
         scratch.innerHTML = '';
         const idx = scratch.dataset.idx;
@@ -175,6 +197,10 @@ function start() {
             callback: function () {
                 resultOfGame.push(number);
 
+                if (resultOfGame.length === 1) {
+                    document.getElementById('restart-button').style = `display: inline-block`;
+                }
+
                 if (resultOfGame.length === 3) {
                     const payout = isWinningCombination(resultOfGame);
 
@@ -185,19 +211,10 @@ function start() {
 
                         document.getElementById('balance').innerText = `$${balance.toFixed(2)}`;
                         payout.forEach((p) => {
-                            const img = new Image();
-                            img.src = `https://akabuda050.github.io/scratch_card/rewards/${p.sym}.png`
-                            img.width = 30;
-                            img.height = 30;
+                            const scratchcard = document.getElementById(`scratchcard-${p.sym}`);
+                            console.log(`scratchcard-${p.sym}`, scratchcard)
 
-                            const div = document.createElement('div');
-                            const span = document.createElement('span');
-                            span.innerText = `x${p.count}`
-                            div.appendChild(img)
-                            div.appendChild(span)
-
-                            document.getElementById('result-sym').appendChild(div);
-
+                            scratchcard.style = 'border: 2px solid red;'
                         })
 
                     } else {
