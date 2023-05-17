@@ -5,27 +5,55 @@ function getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
+// Set up lines, the reels and paytable.
+const lines = {
+    2: 1,
+    11: 1,
+    15: 1,
+
+    3: 2,
+    4: 2,
+    6: 2,
+    7: 2,
+    8: 2,
+    9: 2,
+    10: 2,
+    12: 2,
+    13: 2,
+    16: 2,
+    1: 3,
+    5: 3,
+    17: 3,
+    14: 3,
+    
+}
+
 const paytable = {
-    1: 1.5,   // Payout for number 1
-    2: 1.30,   // Payout for number 2
-    3: 1.70,   // Payout for number 3
-    4: 1.70,   // Payout for number 4
-    5: 0.5,   // Payout for number 5
-    6: 1.70,   // Payout for number 6
-    7: 1.70,   // Payout for number 7
-    8: 0.70,   // Payout for number 8
-    9: 0.70,   // Payout for number 9
-    10: 0.70,  // Payout for number 10
-    11: 1.30,  // Payout for number 11
-    12: 1.30,  // Payout for number 12
-    13: 1.70,  // Payout for number 13
-    14: 1.5,  // Payout for number 14
-    15: 1.70,  // Payout for number 15
-    16: 1.70,  // Payout for number 16
-    17: 0.5   // Payout for number 17
+    2: 0.5,
+    11: 0.65,
+    15: 0.5,
+
+    3: 2.5,
+    4: 1.75,
+    10: 1.75,
+    16: 1.75,
+
+    6: 1.35,
+    7: 1.35,
+    8: 1.45,
+    9: 1.45,
+
+    13: 1.5,
+    
+    1: 4,
+    5: 3,
+
+    17: 3,
+    14: 2.5,
+
+    12: 2,
 };
 
-// Set up the reels and paytable
 const reels = [];
 
 for (let i = 0; i < 3; i++) {
@@ -34,7 +62,7 @@ for (let i = 0; i < 3; i++) {
     // Fill the reel with numbers based on the desired RTP
     for (let number in paytable) {
         const payout = paytable[number];
-        const occurrence = Math.ceil(((number) / 0.98) / payout); // Increase the occurrence by multiplying by 1000
+        const occurrence = Math.round((lines[number] + payout)); // Increase the occurrence by multiplying by 1000
 
         reel.push(...Array(occurrence).fill(number));
     }
@@ -42,26 +70,43 @@ for (let i = 0; i < 3; i++) {
     reels.push(reel);
 }
 
-console.log({ paytable, reels })
+console.log({ paytable, lines, reels })
 
-// Simulate the game and calculate RTP
+// Simulate the game and calculate RTP.
 function simulateGame() {
+    let balance = 1000;
+    let totalLooose = 0;
     let totalSpins = 0;
-    let totalPayout = 0;
+    let totalWin = 0;
 
-    while (totalSpins < 100000) {
+    while (totalSpins < 1000000) {
+
+        if (balance <= 0) {
+            break;
+        }
+
+        balance -= 0.5;
+        totalLooose += 0.5;
+
         const spinResult = spinReels();
+        const payout = isWinningCombination(spinResult);
+        const totalPayout = payout.reduce((acc, curr) => acc + curr.payout, 0);
 
-        if (isWinningCombination(spinResult)) {
-            const payout = paytable[spinResult[0]];
-            totalPayout += payout;
+        if (totalPayout > 0) {
+            totalWin += totalPayout;
+            balance += totalPayout;
         }
 
         totalSpins++;
     }
 
-    const rtp = (totalPayout / totalSpins) * 100;
-    return rtp.toFixed(2);
+    const rtp = (totalWin / totalLooose) * 100;
+    return {
+        rtp: `${rtp.toFixed(2)}%`,
+        balance,
+        totalLooose,
+        totalWin
+    };
 }
 
 // Spin the reels and return the result
@@ -75,25 +120,10 @@ function spinReels() {
     return result;
 }
 
-const lines = {
-    1: 1,
-    2: 2,
-    3: 3,
-    4: 3,
-    5: 1,
-    6: 3,
-    7: 3,
-    8: 3,
-    9: 3,
-    10: 3,
-    11: 2,
-    12: 2,
-    13: 3,
-    14: 1,
-    15: 3,
-    16: 3,
-    17: 1,
-}
+// Run the simulation and output the RTP
+const resultOfSim = simulateGame();
+console.log(resultOfSim);
+
 // Check if the spin result is a winning combination
 function isWinningCombination(spinResult) {
     const grandResult = [];
@@ -107,10 +137,7 @@ function isWinningCombination(spinResult) {
     return grandResult;
 }
 
-// Run the simulation and output the RTP
-//const rtp = simulateGame();
-//console.log(`Simulated RTP: ${rtp}%`);
-
+// Start game.
 let balance = 1000;
 
 document.getElementById('balance').innerText = `$${balance}`;
@@ -120,8 +147,8 @@ let resultOfGame = []
 let cards = [];
 
 function start() {
-    balance -= 1;
-    document.getElementById('balance').innerText = `$${balance}`;
+    balance -= 0.5;
+    document.getElementById('balance').innerText = `$${balance.toFixed(2)}`;
     document.getElementById('restart-button').innerText = `Reveal`;
     document.getElementById('result-sym').innerHTML = '';
     resultOfGame = []
