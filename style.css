@@ -52,7 +52,6 @@ body {
 }
 
 #restart-button {
-   display: none;
    padding: 5px 10px;
    font-size: 16px;
    background-color: #9d00ff;
@@ -60,4 +59,18 @@ body {
    border: none;
    cursor: pointer;
    border-radius: 4px;
+ }
+
+ #result-sym {
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   gap: 5px;
+   width: 100%;
+ }
+
+ #result-sym > div{
+   display: flex;
+   align-items: center;
+   gap: 2px;
  }

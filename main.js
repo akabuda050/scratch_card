@@ -6,23 +6,23 @@ function getRandomInt(min, max) {
 }
 
 const paytable = {
-    1: 1 * 7.58823529411,
-    2: 2 * 3.58823529411,
-    3: 3 * 4.58823529411,
-    4: 4 * 5.58823529411,
-    5: 5 * 0.58823529411,
-    6: 6 * 6.58823529411,
-    7: 7 * 1.58823529411,
-    8: 8 * 4.58823529411,
-    9: 9 * 0.58823529411,
-    10: 10 * 4.58823529411,
-    11: 11 * 0.58823529411,
-    12: 12 * 4.58823529411,
-    13: 13 * 1.58823529411,
-    14: 14 * 5.58823529411,
-    15: 15 * 0.58823529411,
-    16: 16 * 0.58823529411,
-    17: 17 * 0.58823529411,
+    1: 1.5,   // Payout for number 1
+    2: 1.30,   // Payout for number 2
+    3: 1.70,   // Payout for number 3
+    4: 1.70,   // Payout for number 4
+    5: 0.5,   // Payout for number 5
+    6: 1.70,   // Payout for number 6
+    7: 1.70,   // Payout for number 7
+    8: 0.70,   // Payout for number 8
+    9: 0.70,   // Payout for number 9
+    10: 0.70,  // Payout for number 10
+    11: 1.30,  // Payout for number 11
+    12: 1.30,  // Payout for number 12
+    13: 1.70,  // Payout for number 13
+    14: 1.5,  // Payout for number 14
+    15: 1.70,  // Payout for number 15
+    16: 1.70,  // Payout for number 16
+    17: 0.5   // Payout for number 17
 };
 
 // Set up the reels and paytable
@@ -34,7 +34,7 @@ for (let i = 0; i < 3; i++) {
     // Fill the reel with numbers based on the desired RTP
     for (let number in paytable) {
         const payout = paytable[number];
-        const occurrence = Math.ceil(payout / 0.98 / 0.98) ; // Increase the occurrence by multiplying by 1000
+        const occurrence = Math.ceil(((number) / 0.98) / payout); // Increase the occurrence by multiplying by 1000
 
         reel.push(...Array(occurrence).fill(number));
     }
@@ -75,69 +75,141 @@ function spinReels() {
     return result;
 }
 
+const lines = {
+    1: 1,
+    2: 2,
+    3: 3,
+    4: 3,
+    5: 1,
+    6: 3,
+    7: 3,
+    8: 3,
+    9: 3,
+    10: 3,
+    11: 2,
+    12: 2,
+    13: 3,
+    14: 1,
+    15: 3,
+    16: 3,
+    17: 1,
+}
 // Check if the spin result is a winning combination
 function isWinningCombination(spinResult) {
-    const counts = {};
-    for (let i = 0; i < spinResult.length; i++) {
-        const num = spinResult[i];
-        counts[num] = (counts[num] || 0) + 1;
-        if (counts[num] === 3) {
-            return true;
+    const grandResult = [];
+    Object.keys(lines).forEach(((sym) => {
+        const result = spinResult.filter(i => i === sym)
+        if (result.length >= lines[sym]) {
+            let payout = paytable[sym] * result.length;
+            grandResult.push({ sym, count: result.length, payout })
         }
-    }
-    return false;
+    }))
+    return grandResult;
 }
 
 // Run the simulation and output the RTP
 //const rtp = simulateGame();
 //console.log(`Simulated RTP: ${rtp}%`);
 
-const scratchContainers = document.querySelectorAll('.js-scratchcard');
+let balance = 1000;
 
-const resultOfGame = []
-for (let scratch of scratchContainers) {
-    const idx = scratch.dataset.idx;
-    const number = reels[idx][Math.floor(Math.random() * reels[idx].length)];
+document.getElementById('balance').innerText = `$${balance}`;
 
-    let scratchId = '#' + scratch.id;
-    let sc = new ScratchCard(scratchId, {
-        scratchType: SCRATCH_TYPE.LINE,
-        containerWidth: 100,
-        containerHeight: 100,
-        imageForwardSrc: 'https://akabuda050.github.io/scratch_card/images/scratchcard.jpg',
-        imageBackgroundSrc: `https://akabuda050.github.io/scratch_card/rewards/${number}.png`,
-        htmlBackground: '',
-        clearZoneRadius: 10,
-        nPoints: 0,
-        pointSize: 0,
-        percentToFinish: 20,
-        callback: function () {
-            resultOfGame.push(number);
 
-            if (resultOfGame.length === 3) {
-                if (isWinningCombination(resultOfGame)) {
-                    const payout = paytable[resultOfGame[0]];
+let resultOfGame = []
+let cards = [];
 
-                    document.getElementById('result-text').innerText = `You won $${payout}`;
-                } else {
-                    document.getElementById('result-text').innerText = `Good luck next time :)`;
+function start() {
+    balance -= 1;
+    document.getElementById('balance').innerText = `$${balance}`;
+    document.getElementById('restart-button').innerText = `Reveal`;
+    document.getElementById('result-sym').innerHTML = '';
+    resultOfGame = []
+    cards = [];
+    const scratchContainers = document.querySelectorAll('.js-scratchcard');
+
+    for (let scratch of scratchContainers) {
+        scratch.innerHTML = '';
+        const idx = scratch.dataset.idx;
+        const number = reels[idx][Math.floor(Math.random() * reels[idx].length)];
+
+        let scratchId = '#' + scratch.id;
+        let sc = new ScratchCard(scratchId, {
+            scratchType: SCRATCH_TYPE.LINE,
+            containerWidth: 100,
+            containerHeight: 100,
+            imageForwardSrc: 'https://akabuda050.github.io/scratch_card/images/scratchcard.jpg',
+            imageBackgroundSrc: `https://akabuda050.github.io/scratch_card/rewards/${number}.png`,
+            htmlBackground: '',
+            clearZoneRadius: 10,
+            nPoints: 0,
+            pointSize: 0,
+            percentToFinish: 20,
+            callback: function () {
+                resultOfGame.push(number);
+
+                if (resultOfGame.length === 3) {
+                    const payout = isWinningCombination(resultOfGame);
+
+                    const totalPayout = payout.reduce((acc, curr) => acc + curr.payout, 0)
+                    if (totalPayout > 0) {
+                        document.getElementById('result-text').innerText = `You won $${totalPayout.toFixed(2)}`;
+                        balance += totalPayout;
+
+                        document.getElementById('balance').innerText = `$${balance.toFixed(2)}`;
+                        payout.forEach((p) => {
+                            const img = new Image();
+                            img.src = `https://akabuda050.github.io/scratch_card/rewards/${p.sym}.png`
+                            img.width = 30;
+                            img.height = 30;
+
+                            const div = document.createElement('div');
+                            const span = document.createElement('span');
+                            span.innerText = `x${p.count}`
+                            div.appendChild(img)
+                            div.appendChild(span)
+
+                            document.getElementById('result-sym').appendChild(div);
+
+                        })
+
+                    } else {
+                        document.getElementById('result-text').innerText = `Good luck next time :)`;
+                    }
+
+                    reveald = true;
+                    document.getElementById('restart-button').innerText = `Restart`;
                 }
-                document.getElementById('restart-button').style = `display: inline-block`;
             }
-        }
-    });
-
-    // Init
-    sc.init().then(() => {
-        sc.canvas.addEventListener('scratch.move', () => {
-            let percent = sc.getPercent().toFixed(0);
-        })
-    }).catch((error) => {
-        // image not loaded
-        alert(error.message);
-    });
+        });
+        cards.push(sc);
+        // Init
+        sc.init().then(() => {
+            sc.canvas.addEventListener('scratch.move', () => {
+                let percent = sc.getPercent().toFixed(0);
+            })
+        }).catch((error) => {
+            // image not loaded
+            alert(error.message);
+        });
+    }
 }
 
+let reveald = false;
 function restart() {
-    window.location.reload()
+    if (reveald) {
+        reveald = false
+        start();
+
+        return;
+    }
+
+    cards.forEach((sc) => {
+        sc.percent = 100;
+        sc.finish();
+    });
+    reveald = true;
+    document.getElementById('restart-button').innerText = `Restart`;
 }
+
+start()
