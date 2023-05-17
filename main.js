@@ -54,8 +54,9 @@ const paytable = {
     12: 2,
 };
 
+const sortedArray = Object.entries(paytable).sort(([keyA, valueA], [keyB, valueB]) => valueA - valueB);
 const paytableWrapper = document.getElementById('sc__wrapper2')
-Object.keys(paytable).forEach((p) => {
+sortedArray.forEach(([p]) => {
     const paytableItem = document.createElement('div');
     paytableItem.id = `scratchcard-${p}`;
     paytableItem.classList.add('scratchcard');
