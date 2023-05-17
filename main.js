@@ -1,3 +1,4 @@
+window.Telegram.WebApp.expand()
 function getRandomInt(min, max) {
     min = Math.ceil(min);
     max = Math.floor(max);
